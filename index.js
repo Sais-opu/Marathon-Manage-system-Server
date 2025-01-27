@@ -36,12 +36,14 @@ async function run() {
         // // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+
         // marathons api
         const marathonCollection = client.db('manageMaraathon').collection('marathon');
-
         //apply list collection apis make
         const applyCollection=client.db('manageMaraathon').collection('apply_application');
 
+        // all marathon
         app.get('/marathon', async (req, res) => {
             const cursor = marathonCollection.find();
             const result = await cursor.toArray();
@@ -54,13 +56,37 @@ async function run() {
             const result = await marathonCollection.findOne(query)
             res.send(result)
         })
-        // app list making get form databse for list
-        app.get('/job-applylist',async(req,res)=>{
-            const email =req.query.email;
-            const query={apply_email:email}
-            const result = await applyCollection.find(query).toArray();
+
+
+        // post for addmarathon
+        app.post('/marathon',async(req,res)=>{
+            const addMarathon=req.body;
+            const result =await marathonCollection.insertOne(addMarathon);
             res.send(result);
+            
         })
+
+
+        // apply list making get form database for list start
+        app.get('/job-applylist', async (req, res) => {
+            const email = req.query.email;
+            const query = { apply_email: email };
+            const result = await applyCollection.find(query).toArray();
+        
+            for (const list of result) {
+                const queryList = { _id: new ObjectId(list.marathon_id) };
+                const listapply = await marathonCollection.findOne(queryList);
+        
+                if (listapply) {
+                    list.Title = listapply.Title;
+                    list.MarathonStartDate = listapply.MarathonStartDate;
+                }
+            }
+            console.log("Enriched result:", result); // Debug here
+            res.send(result);
+        });
+        // apply list making get form database for list end
+        
 
         // apply list apis to database
         app.post('/apply-applications',async(req,res)=>{
@@ -69,6 +95,9 @@ async function run() {
             res.send(result);
             
         })
+        // apply list apis to database 
+
+
     }
     catch (error) {
         console.log('error connecting to mongobd', error)
