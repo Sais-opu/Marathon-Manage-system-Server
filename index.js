@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const express = require('express');
 const cors = require('cors')
@@ -21,11 +21,11 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     }
 });
-app.get('/', (req,res)=>{
+app.get('/', (req, res) => {
     res.send('marathon is started')
 })
 
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`marathon waited at:${port}`)
 })
 
@@ -44,6 +44,13 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result)
         });
+        // specific details
+        app.get('/marathon/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await marathonCollection.findOne(query)
+            res.send(result)
+        })
     }
     catch (error) {
         console.log('error connecting to mongobd', error)
