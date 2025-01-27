@@ -43,6 +43,16 @@ async function run() {
         //apply list collection apis make
         const applyCollection=client.db('manageMaraathon').collection('apply_application');
 
+        // first 6
+        app.get('/marathon/first6', async (req, res) => {
+            
+                const cursor = marathonCollection.find().limit(6);
+                const result = await cursor.toArray();
+                console.log('Fetched marathons:', result); // Debug
+                res.send(result);
+            
+        });
+
         // all marathon
         app.get('/marathon', async (req, res) => {
             const cursor = marathonCollection.find();
