@@ -39,6 +39,9 @@ async function run() {
         // marathons api
         const marathonCollection = client.db('manageMaraathon').collection('marathon');
 
+        //apply list collection apis
+        const applyCollection=client.db('manageMaraathon').collection('apply_application');
+
         app.get('/marathon', async (req, res) => {
             const cursor = marathonCollection.find();
             const result = await cursor.toArray();
@@ -50,6 +53,14 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await marathonCollection.findOne(query)
             res.send(result)
+        })
+
+        // apply list apis
+        app.post('/apply-applications',async(req,res)=>{
+            const application =req.body;
+            const result =await applyCollection.insertOne(application);
+            res.send(result);
+            
         })
     }
     catch (error) {
