@@ -39,7 +39,7 @@ async function run() {
         // marathons api
         const marathonCollection = client.db('manageMaraathon').collection('marathon');
 
-        //apply list collection apis
+        //apply list collection apis make
         const applyCollection=client.db('manageMaraathon').collection('apply_application');
 
         app.get('/marathon', async (req, res) => {
@@ -54,8 +54,15 @@ async function run() {
             const result = await marathonCollection.findOne(query)
             res.send(result)
         })
+        // app list making get form databse for list
+        app.get('/job-applylist',async(req,res)=>{
+            const email =req.query.email;
+            const query={apply_email:email}
+            const result = await applyCollection.find(query).toArray();
+            res.send(result);
+        })
 
-        // apply list apis
+        // apply list apis to database
         app.post('/apply-applications',async(req,res)=>{
             const application =req.body;
             const result =await applyCollection.insertOne(application);
