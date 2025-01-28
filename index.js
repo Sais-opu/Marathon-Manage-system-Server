@@ -1,10 +1,12 @@
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 
 const express = require('express');
 const cors = require('cors')
 require('dotenv').config()
 const port = process.env.PORT || 5000;
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
+
 app.use(cors())
 app.use(express.json())
 // marathonsystem
@@ -41,24 +43,24 @@ async function run() {
         // marathons api
         const marathonCollection = client.db('manageMaraathon').collection('marathon');
         //apply list collection apis make
-        const applyCollection=client.db('manageMaraathon').collection('apply_application');
+        const applyCollection = client.db('manageMaraathon').collection('apply_application');
 
         // first 6
         app.get('/marathon/first6', async (req, res) => {
-            
-                const cursor = marathonCollection.find().limit(6);
-                const result = await cursor.toArray();
-                console.log('Fetched marathons:', result); // Debug
-                res.send(result);
-            
+
+            const cursor = marathonCollection.find().limit(6);
+            const result = await cursor.toArray();
+            console.log('Fetched marathons:', result); // Debug
+            res.send(result);
+
         });
 
         // all marathon
-        app.get('/marathon', async (req, res) => { 
-            const email=req.query.eamil;
-            let query={}
-            if(email){
-                query={email:emial}
+        app.get('/marathon', async (req, res) => {
+            const email = req.query.eamil;
+            let query = {}
+            if (email) {
+                query = { emial }
             }
             const cursor = marathonCollection.find(query);
             const result = await cursor.toArray();
@@ -74,11 +76,11 @@ async function run() {
 
 
         // post for addmarathon
-        app.post('/marathon',async(req,res)=>{
-            const addMarathon=req.body;
-            const result =await marathonCollection.insertOne(addMarathon);
+        app.post('/marathon', async (req, res) => {
+            const addMarathon = req.body;
+            const result = await marathonCollection.insertOne(addMarathon);
             res.send(result);
-            
+
         })
 
 
@@ -87,11 +89,11 @@ async function run() {
             const email = req.query.email;
             const query = { apply_email: email };
             const result = await applyCollection.find(query).toArray();
-        
+
             for (const list of result) {
                 const queryList = { _id: new ObjectId(list.marathon_id) };
                 const listapply = await marathonCollection.findOne(queryList);
-        
+
                 if (listapply) {
                     list.Title = listapply.Title;
                     list.MarathonStartDate = listapply.MarathonStartDate;
@@ -101,14 +103,14 @@ async function run() {
             res.send(result);
         });
         // apply list making get form database for list end
-        
+
 
         // apply list apis to database
-        app.post('/apply-applications',async(req,res)=>{
-            const application =req.body;
-            const result =await applyCollection.insertOne(application);
+        app.post('/apply-applications', async (req, res) => {
+            const application = req.body;
+            const result = await applyCollection.insertOne(application);
             res.send(result);
-            
+
         })
         // apply list apis to database 
 
