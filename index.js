@@ -55,6 +55,7 @@ async function run() {
 
         });
 
+
         // all marathon
         app.get('/marathon', async (req, res) => {
             const email = req.query.eamil;
@@ -82,6 +83,89 @@ async function run() {
             res.send(result);
 
         })
+        // marathon list update and delete start
+        app.put('/marathon/:id/update', async (req, res) => {
+            const marathonId = req.params.id;
+            const { Title, RegistrationDeadline, MarathonStartDate, Location } = req.body;
+            try {
+                const result = await marathonCollection.updateOne(
+                    { _id: new ObjectId(marathonId) },
+                    {
+                        $set: {
+                            Title,
+                            RegistrationDeadline,
+                            MarathonStartDate,
+                            Location,
+                        },
+                    }
+                );
+                if (result.modifiedCount > 0) {
+                    res.status(200).json({ message: 'Marathon updated successfully' });
+                } else {
+                    res.status(404).json({ message: 'Marathon not found or no changes made' });
+                }
+            } catch (error) {
+                console.error('Error updating marathon:', error.message);
+                res.status(500).json({ message: 'Error updating marathon', error: error.message });
+            }
+        });
+        
+        app.delete('/marathon/:id/delete', async (req, res) => {
+            const marathonId = req.params.id;
+            try {
+                const result = await marathonCollection.deleteOne({ _id: new ObjectId(marathonId) });
+                if (result.deletedCount > 0) {
+                    res.status(200).json({ message: 'Marathon deleted successfully' });
+                } else {
+                    res.status(404).json({ message: 'Marathon not found' });
+                }
+            } catch (error) {
+                console.error('Error deleting marathon:', error.message);
+                res.status(500).json({ message: 'Error deleting marathon', error: error.message });
+            }
+        });
+        // marathon list update and delete end
+
+        // apply list delete and update start
+        app.put('/apply-application/:id/update', async (req, res) => {
+            const applicationId = req.params.id;
+            const { apply_email, marathon_id, status } = req.body;
+            try {
+                const result = await applyCollection.updateOne(
+                    { _id: new ObjectId(applicationId) },
+                    {
+                        $set: {
+                            apply_email,
+                            marathon_id,
+                            status,
+                        },
+                    }
+                );
+                if (result.modifiedCount > 0) {
+                    res.status(200).json({ message: 'Application updated successfully' });
+                } else {
+                    res.status(404).json({ message: 'Application not found or no changes made' });
+                }
+            } catch (error) {
+                console.error('Error updating application:', error.message);
+                res.status(500).json({ message: 'Error updating application', error: error.message });
+            }
+        });
+        app.delete('/apply-application/:id/delete', async (req, res) => {
+            const applicationId = req.params.id;
+            try {
+                const result = await applyCollection.deleteOne({ _id: new ObjectId(applicationId) });
+                if (result.deletedCount > 0) {
+                    res.status(200).json({ message: 'Application deleted successfully' });
+                } else {
+                    res.status(404).json({ message: 'Application not found' });
+                }
+            } catch (error) {
+                console.error('Error deleting application:', error.message);
+                res.status(500).json({ message: 'Error deleting application', error: error.message });
+            }
+        });
+        // apply list delete and upddate end
 
 
         // apply list making get form database for list start
