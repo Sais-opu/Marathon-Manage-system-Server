@@ -54,8 +54,13 @@ async function run() {
         });
 
         // all marathon
-        app.get('/marathon', async (req, res) => {
-            const cursor = marathonCollection.find();
+        app.get('/marathon', async (req, res) => { 
+            const email=req.query.eamil;
+            let query={}
+            if(email){
+                query={email:emial}
+            }
+            const cursor = marathonCollection.find(query);
             const result = await cursor.toArray();
             res.send(result)
         });
